@@ -1,9 +1,17 @@
 package fastcampus.webflux.practice;
 
+import com.sun.net.httpserver.HttpServer;
 import io.netty.bootstrap.ServerBootstrap;
-import io.netty.channel.*;
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelFutureListener;
+import io.netty.channel.ChannelInitializer;
+import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
+import io.netty.handler.codec.http.HttpObjectAggregator;
+import io.netty.handler.codec.http.HttpRequestEncoder;
+import io.netty.handler.codec.http.HttpResponseDecoder;
+import io.netty.handler.codec.http.HttpServerCodec;
 import io.netty.handler.codec.string.StringDecoder;
 import io.netty.handler.codec.string.StringEncoder;
 import io.netty.handler.logging.LogLevel;
@@ -14,7 +22,7 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class NettyEchoServer {
+public class NettyHttpServer {
 
     @SneakyThrows
     public static void main(String[] args) {
@@ -34,9 +42,9 @@ public class NettyEchoServer {
                                     .addLast(eventExecutorGroup, new LoggingHandler(LogLevel.INFO));
                             channel.pipeline()
                                     .addLast(
-                                            new StringEncoder(),
-                                            new StringDecoder(),
-                                            new NettyEchoServerHandler()
+                                            new HttpServerCodec(),
+                                            new HttpObjectAggregator(1024 * 1024),
+                                            new NettyHttpServerHandler()
                                     );
                         }
                     });
