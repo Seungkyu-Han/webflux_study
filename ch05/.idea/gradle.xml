@@ -12,10 +12,26 @@
         </option>
       </GradleProjectSettings>
       <GradleProjectSettings>
+        <option name="externalProjectPath" value="$PROJECT_DIR$/webHandler" />
+        <option name="modules">
+          <set>
+            <option value="$PROJECT_DIR$/webHandler" />
+          </set>
+        </option>
+      </GradleProjectSettings>
+      <GradleProjectSettings>
         <option name="externalProjectPath" value="$PROJECT_DIR$/webflux" />
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$/webflux" />
+          </set>
+        </option>
+      </GradleProjectSettings>
+      <GradleProjectSettings>
+        <option name="externalProjectPath" value="$PROJECT_DIR$/webflux-image" />
+        <option name="modules">
+          <set>
+            <option value="$PROJECT_DIR$/webflux-image" />
           </set>
         </option>
       </GradleProjectSettings>

@@ -9,8 +9,7 @@ import java.util.stream.IntStream;
 public class SequenceHandlerExample {
 
     public static void main(String[] args) {
-
-        Flux.fromStream(IntStream.range(0, 10).boxed())
+        Flux.fromStream(IntStream.range(1, 10).boxed())
                 .handle((value, sink) -> {
                     if(value % 2 == 0) {
                         sink.next(value);
@@ -18,7 +17,6 @@ public class SequenceHandlerExample {
                 }).subscribe(
                         value -> log.info("value: {}", value),
                         error -> log.error("error: {}", error.getMessage()),
-                        () -> log.info("complete")
-                );
+                        () -> log.info("complete"));
     }
 }

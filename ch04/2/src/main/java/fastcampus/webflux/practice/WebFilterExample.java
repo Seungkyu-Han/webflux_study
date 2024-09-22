@@ -27,48 +27,57 @@ public class WebFilterExample {
             @Override
             public Mono<Void> handle(ServerWebExchange exchange) {
                 log.info("web handler");
+
                 final ServerHttpRequest request = exchange.getRequest();
                 final ServerHttpResponse response = exchange.getResponse();
 
                 final String nameHeader = request.getHeaders()
                         .getFirst("X-Custom-Name");
+
                 log.info("X-Custom-Name: {}", nameHeader);
                 String name = exchange.getAttribute("name");
                 String content = "Hello " + name;
+
                 Mono<DataBuffer> responseBody = Mono.just(
                         response.bufferFactory().wrap(content.getBytes())
                 );
 
-                response.getHeaders().add("Content-Type", "text/plain");
+                response.getHeaders()
+                        .add("Content-Type", "text/plain");
+
                 return response.writeWith(responseBody);
             }
         };
-
 
         var extractNameFromHeaderFilter = new WebFilter(){
             @Override
             public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
                 log.info("extractNameFromHeaderFilter");
+
                 final ServerHttpRequest request = exchange.getRequest();
                 final ServerHttpResponse response = exchange.getResponse();
 
-                String name = request.getHeaders().getFirst("X-Custom-Name");
+                String name = request.getHeaders()
+                        .getFirst("X-Custom-Name");
 
-                if(name==null){
+                if(name == null){
                     response.setStatusCode(HttpStatus.BAD_REQUEST);
                     return response.setComplete();
-                }else{
+                }
+
+                else{
                     exchange.getAttributes().put("name", name);
-                    var newReq = request.mutate()
+                    var newReq = request
+                            .mutate()
                             .headers(h -> h.remove("X-Custom-Name"))
                             .build();
+
                     return chain.filter(exchange.mutate().request(newReq).build());
                 }
             }
         };
 
-
-        var timeLoggingFilter = new WebFilter() {
+        var timeLoggingFilter = new WebFilter(){
             @Override
             public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
                 log.info("timeLoggingFilter");
@@ -76,7 +85,7 @@ public class WebFilterExample {
                 return chain.filter(exchange)
                         .doOnSuccess(v -> {
                             long endTime = System.nanoTime();
-                            log.info("time: {} ms", (endTime - startTime)/1000000.0);
+                            log.info("time: {} ms", (endTime - startTime) / 1_000_000.0);
                         });
             }
         };
@@ -84,19 +93,18 @@ public class WebFilterExample {
         final HttpHandler webHttpHandler = WebHttpHandlerBuilder
                 .webHandler(webHandler)
                 .filter(
-                        extractNameFromHeaderFilter,
-                        timeLoggingFilter
+                        extractNameFromHeaderFilter, timeLoggingFilter
                 )
                 .build();
 
         final var adapter = new ReactorHttpHandlerAdapter(webHttpHandler);
+
         HttpServer.create()
-                .host("localhost")
+                .host("127.0.0.1")
                 .port(8080)
                 .handle(adapter)
                 .bindNow()
                 .channel().closeFuture().sync();
+        
     }
-
-
 }

@@ -9,14 +9,11 @@ import java.io.IOException;
 public class OnErrorMapByResumeExample {
 
     public static void main(String[] args) {
-        log.info("start main");
-
         Flux.error(new IOException("fail to read file"))
-                .onErrorResume(error -> Flux.error(new NullPointerException("custom")))
+                .onErrorResume(error -> Flux.error(new RuntimeException("fail to read file")))
                 .subscribe(
                         value -> log.info("value: {}", value),
-                        error -> log.error("error: {}", error.getMessage()));
-
-        log.info("end main");
+                        error -> log.error("error: {}", error.getMessage())
+                );
     }
 }

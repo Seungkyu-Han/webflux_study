@@ -7,8 +7,6 @@ import reactor.core.publisher.Flux;
 public class OnErrorCompleteExample {
 
     public static void main(String[] args) {
-        log.info("start main");
-
         Flux.create(sink -> {
             sink.next(1);
             sink.next(2);
@@ -19,8 +17,5 @@ public class OnErrorCompleteExample {
                         error -> log.error("error: {}", error.getMessage()),
                         () -> log.info("complete")
                 );
-
-
-        log.info("end main");
     }
 }

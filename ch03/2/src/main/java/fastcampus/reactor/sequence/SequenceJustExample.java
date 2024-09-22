@@ -8,12 +8,10 @@ import reactor.core.publisher.Mono;
 public class SequenceJustExample {
 
     public static void main(String[] args) {
-        Mono.just(1)
-                .subscribe(value -> {
-                    log.info("value: {}", value);
-                });
 
-        Flux.just(1, 2, 3, 4, 5)
-                .subscribe(value -> log.info("value: {}", value));
+        Mono.just(1)
+                .subscribe(value -> log.info("{}", value));
+
+        Flux.just(1, 2, 3, 4, 5).subscribe(value -> log.info("{}", value));
     }
 }

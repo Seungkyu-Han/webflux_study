@@ -8,19 +8,10 @@ import reactor.core.publisher.Mono;
 public class SequenceErrorExample {
 
     public static void main(String[] args) {
-
-        log.info("start main");
-
         Mono.error(new RuntimeException("mono error"))
-                .subscribe(
-                        value -> log.info("value: {}", value),
-                        error -> log.error("error: {}", error.getMessage()));
+                .subscribe(null, error -> log.error("mono error: {}", error.getMessage()));
 
         Flux.error(new RuntimeException("flux error"))
-                .subscribe(
-                        value -> log.info("value: {}", value),
-                        error -> log.error("error: {}", error.getMessage()));
-
-        log.info("end main");
+                .subscribe(null, error -> log.error("flux error: {}", error.getMessage()));
     }
 }

@@ -19,39 +19,40 @@ public class WebHandlerOnlyAcceptJsonExample {
 
     @SneakyThrows
     public static void main(String[] args) {
-        log.info("start main");
-
         var codecConfigurer = ServerCodecConfigurer.create();
 
         var webHandler = new WebHandler(){
             @Override
             public Mono<Void> handle(ServerWebExchange exchange) {
-                final ServerRequest request = ServerRequest.create(
-                        exchange,
-                        codecConfigurer.getReaders()
+                final ServerRequest serverRequest = ServerRequest.create(
+                        exchange, codecConfigurer.getReaders()
                 );
 
                 final ServerHttpResponse response = exchange.getResponse();
 
-                final var bodyMono = request.bodyToMono(NameHolder.class);
-                return bodyMono.flatMap(nameHolder -> {
-                    String nameQuery = nameHolder.getName();
-                    String name = (nameQuery == null)? "world" : nameQuery;
+                final var bodyMono = serverRequest.bodyToMono(NameHolder.class);
 
-                    String content = "Hello "+ name;
-                    log.info("responseBody: {}", content);
+                return bodyMono.flatMap(
+                        nameHolder -> {
+                            String nameQuery = nameHolder.getName();
+                            String name = (nameQuery == null)? "world" : nameQuery;
 
-                    Mono<DataBuffer> responseBody = Mono.just(
-                            response.bufferFactory()
-                                    .wrap(content.getBytes())
-                    );
 
-                    response.getHeaders()
-                            .add("Content-Type", "text/plain");
-                    return response.writeWith(responseBody);
-                });
+                            String content = "Hello " + name;
+                            log.info("responseBody: {}", content);
+                            Mono<DataBuffer> responseBody = Mono.just(
+                                    response.bufferFactory()
+                                            .wrap(content.getBytes())
+                            );
+
+                            response.getHeaders()
+                                    .add("Content-Type", "text/plain");
+                            return response.writeWith(responseBody);
+                        }
+                );
             }
         };
+
 
         final HttpHandler webHttpHandler = WebHttpHandlerBuilder
                 .webHandler(webHandler)

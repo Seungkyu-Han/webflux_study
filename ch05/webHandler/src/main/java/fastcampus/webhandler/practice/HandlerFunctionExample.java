@@ -1,0 +1,29 @@
+package fastcampus.webhandler.practice;
+
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.CacheControl;
+import org.springframework.http.ResponseCookie;
+import org.springframework.web.reactive.function.server.HandlerFunction;
+import org.springframework.web.reactive.function.server.ServerResponse;
+
+@Slf4j
+public class HandlerFunctionExample {
+
+    public static void main(String[] args) {
+        HandlerFunction<ServerResponse> handler = request -> {
+            String name = request.queryParam("name")
+                    .orElse("world");
+
+            String content = "Hello " + name;
+
+            ResponseCookie responseCookie = ResponseCookie.from("name", name).build();
+
+
+            return ServerResponse.ok()
+                    .cookie(responseCookie)
+                    .headers(headers -> headers.add("X-Hello", name))
+                    .cacheControl(CacheControl.noCache())
+                    .bodyValue(content);
+        };
+    }
+}

@@ -19,32 +19,35 @@ public class WebHandlerOnlyFormDataExample {
 
     @SneakyThrows
     public static void main(String[] args) {
-        log.info("start main");
-        var webHandler = new WebHandler() {
+        var webHandler = new WebHandler(){
             @Override
             public Mono<Void> handle(ServerWebExchange exchange) {
                 final ServerHttpRequest request = exchange.getRequest();
                 final ServerHttpResponse response = exchange.getResponse();
 
-                return exchange.getFormData().flatMap(formData -> {
-                    String nameQuery = formData.getFirst("name");
-                    String name = nameQuery == null ? "world" : nameQuery;
+                return exchange.getFormData().flatMap(
+                        formData -> {
+                            String nameQuery = formData.getFirst("name");
+                            String name = (nameQuery == null) ? "world" : nameQuery;
 
-                    String content = "Hello " + name;
-                    log.info("responseBody: {}", content);
-                    Mono<DataBuffer> responseBody = Mono.just(
-                            response.bufferFactory()
-                                    .wrap(content.getBytes())
-                    );
+                            String content = "Hello " + name;
 
-                    response.addCookie(
-                            ResponseCookie.from("name", name).build());
-                    response.getHeaders()
-                            .add("Content-Type", "text/plain");
-                    return response.writeWith(responseBody);
-                });
+                            log.info("responseBody: {}", content);
+
+                            Mono<DataBuffer> responseBody = Mono.just(
+                                    response.bufferFactory()
+                                            .wrap(content.getBytes())
+                            );
+
+                            response.addCookie(ResponseCookie.from("name", name).build());
+                            response.getHeaders().add("Content-Type", "text/plain");
+
+                            return response.writeWith(responseBody);
+                        }
+                );
             }
         };
+
 
         final HttpHandler webHttpHandler = WebHttpHandlerBuilder
                 .webHandler(webHandler)

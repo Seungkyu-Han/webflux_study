@@ -7,15 +7,11 @@ import reactor.core.publisher.Flux;
 public class DoOnErrorExample {
 
     public static void main(String[] args) {
-        log.info("start main");
-
         Flux.error(new RuntimeException("error"))
-                .doOnError(error -> log.info("doOnError: {}", error))
+                .doOnError(error -> log.info("error: {}", error))
                 .subscribe(
                         value -> log.info("value: {}", value),
                         error -> log.error("error: {}", error.getMessage())
                 );
-
-        log.info("end main");
     }
 }

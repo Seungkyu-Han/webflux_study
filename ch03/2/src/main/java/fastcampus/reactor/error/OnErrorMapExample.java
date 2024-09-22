@@ -7,14 +7,22 @@ import java.io.IOException;
 
 @Slf4j
 public class OnErrorMapExample {
+
+    private static class CustomException extends RuntimeException {
+        public CustomException(String message) {
+            super(message);
+        }
+    }
+
     public static void main(String[] args) {
         log.info("start main");
 
         Flux.error(new IOException("fail to read file"))
-                .onErrorMap(error -> new NullPointerException("custom"))
+                .onErrorMap(e -> new CustomException("custom"))
                 .subscribe(
                         value -> log.info("value: {}", value),
-                        error -> log.info("error: {}", error.getMessage()));
+                        error -> log.error("error: {}", error.getMessage())
+                );
 
         log.info("end main");
     }

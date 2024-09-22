@@ -10,28 +10,17 @@ import java.util.stream.IntStream;
 public class SequenceFluxFromExample {
 
     public static void main(String[] args) {
+        Flux.fromIterable(List.of(1, 2, 3, 4, 5))
+                .subscribe(value -> log.info("iterable value: {}", value));
 
-        log.info("start main");
-
-        Flux.fromIterable(
-                List.of(1, 2, 3, 4, 5)
-        ).subscribe(SequenceFluxFromExample::logValue);
-
-        Flux.fromStream(
-                IntStream.range(1, 6).boxed()
-        ).subscribe(SequenceFluxFromExample::logValue);
+        Flux.fromStream(IntStream.range(1, 6).boxed())
+                .subscribe(value -> log.info("stream value: {}", value));
 
         Flux.fromArray(
                 new Integer[]{1, 2, 3, 4, 5}
-        ).subscribe(SequenceFluxFromExample::logValue);
+        ).subscribe(value -> log.info("array value: {}", value));
 
         Flux.range(1, 5)
-                .subscribe(SequenceFluxFromExample::logValue);
-
-        log.info("end main");
-    }
-
-    private static void logValue(Object value){
-        log.info(value.toString());
+                .subscribe(value -> log.info("range value: {}", value));
     }
 }

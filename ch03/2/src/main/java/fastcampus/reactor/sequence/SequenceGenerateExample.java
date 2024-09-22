@@ -11,16 +11,13 @@ public class SequenceGenerateExample {
                 () -> 0,
                 (state, sink) -> {
                     sink.next(state);
-                    sink.next(state);
-                    if(state == 9) {
+                    if(state == 9)
                         sink.complete();
-                    }
                     return state + 1;
                 }
         ).subscribe(
                 value -> log.info("value: {}", value),
                 error -> log.error("error: {}", error.getMessage()),
-                () -> log.info("complete")
-        );
+                () -> log.info("complete"));
     }
 }

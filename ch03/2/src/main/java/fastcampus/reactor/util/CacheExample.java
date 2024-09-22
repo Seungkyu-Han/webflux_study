@@ -1,14 +1,16 @@
 package fastcampus.reactor.util;
 
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Flux;
 
 @Slf4j
 public class CacheExample {
 
-    public static void main(String[] args) throws InterruptedException {
+    @SneakyThrows
+    public static void main(String[] args) {
         Flux<Object> flux = Flux.create(sink -> {
-            for(int i = 0; i < 3; i++){
+            for(int i = 0; i < 5; i++){
                 log.info("next: {}", i);
                 sink.next(i);
             }
@@ -16,16 +18,12 @@ public class CacheExample {
             sink.complete();
         }).cache();
 
-        flux.subscribe(
-                value -> log.info("value: {}", value)
-        );
-
-        flux.subscribe(
-                value -> log.info("value: {}", value)
-        );
-
-        Thread.sleep(1000);
-
-        log.info("end main");
+        for(int i = 0; i < 2; i++){
+            flux.subscribe(
+                    value -> log.info("value1: {}", value),
+                    null,
+                    () -> log.info("complete")
+            );
+        }
     }
 }

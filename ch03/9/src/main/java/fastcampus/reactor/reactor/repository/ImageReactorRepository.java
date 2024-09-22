@@ -11,7 +11,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
-
 @Slf4j
 public class ImageReactorRepository {
     private final Map<String, ImageEntity> imageMap;
@@ -22,26 +21,26 @@ public class ImageReactorRepository {
         );
     }
 
+
     @SneakyThrows
     public Mono<ImageEntity> findById(String id) {
         return Mono.create(sink -> {
-            try{
+            log.info("ImageRepository.findById: {}", id);
+
+            try {
                 Thread.sleep(1000);
-            }catch(InterruptedException e){
+            } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
 
             var image = imageMap.get(id);
-
             if (image == null) {
                 sink.error(new RuntimeException("image not found"));
-            }
-            else{
+            } else {
                 sink.success(image);
             }
         });
     }
-
 
     public Mono<ImageEntity> findWithContext() {
         return Mono.deferContextual(context -> {

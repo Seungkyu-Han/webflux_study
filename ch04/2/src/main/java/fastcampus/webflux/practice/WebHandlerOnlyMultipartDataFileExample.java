@@ -1,6 +1,5 @@
 package fastcampus.webflux.practice;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -22,44 +21,46 @@ public class WebHandlerOnlyMultipartDataFileExample {
 
     @SneakyThrows
     public static void main(String[] args) {
-        log.info("start main");
-
         var objectMapper = new ObjectMapper();
 
-        var webHandler = new WebHandler() {
+        var webHandler = new WebHandler(){
             @Override
             public Mono<Void> handle(ServerWebExchange exchange) {
                 final ServerHttpResponse response = exchange.getResponse();
 
-                return exchange.getMultipartData().flatMap(multipartFile -> {
-                    return (multipartFile.getFirst("data")).content()
-                            .map(dataBuffer -> dataBuffer.toString(StandardCharsets.UTF_8))
-                            .reduce((s1, s2) -> s1 + s2);
-                }).flatMap(json -> {
-                    String name;
-                    try {
-                        name = objectMapper.readTree(json).get("name").asText();
-                    } catch (JsonProcessingException e) {
-                        log.error(e.getMessage());
-                        name = "world";
-                    }
+                return exchange.getMultipartData().flatMap(
+                        multipartData -> {
+                            return (multipartData.getFirst("data")).content()
+                                    .map(dataBuffer -> dataBuffer.toString(StandardCharsets.UTF_8))
+                                    .reduce((s1, s2) -> s1 + s2);
+                        }
+                ).flatMap(
+                        json -> {
+                            String name;
+                            try{
+                                name = objectMapper.readTree(json).get("name").asText();
+                            }catch(Exception e){
+                                log.error(e.getMessage(), e);
+                                name = "world";
+                            }
 
+                            String content = "Hello " + name;
+                            log.info("responseBody: {}", content);
+                            Mono<DataBuffer> responseBody = Mono.just(
+                                    response.bufferFactory()
+                                            .wrap(content.getBytes())
+                            );
 
-                    String content = "Hello " + name;
-                    log.info("responseBody: {}", content);
-                    Mono<DataBuffer> responseBody = Mono.just(
-                            response.bufferFactory()
-                                    .wrap(content.getBytes())
-                    );
-
-                    response.addCookie(
-                            ResponseCookie.from("name", name).build());
-                    response.getHeaders()
-                            .add("Content-Type", "text/plain");
-                    return response.writeWith(responseBody);
-                });
+                            response.addCookie(
+                                    ResponseCookie.from("name", name).build());
+                            response.getHeaders()
+                                    .add("Content-Type", "text/plain");
+                            return response.writeWith(responseBody);
+                        }
+                );
             }
         };
+
 
         final HttpHandler webHttpHandler = WebHttpHandlerBuilder
                 .webHandler(webHandler)
@@ -72,8 +73,5 @@ public class WebHandlerOnlyMultipartDataFileExample {
                 .handle(adapter)
                 .bindNow()
                 .channel().closeFuture().sync();
-
-
     }
-
 }

@@ -14,6 +14,7 @@ import org.springframework.web.server.adapter.WebHttpHandlerBuilder;
 import reactor.core.publisher.Mono;
 import reactor.netty.http.server.HttpServer;
 
+
 @Slf4j
 public class WebHandlerOnlyQueryParamExample {
 
@@ -29,13 +30,17 @@ public class WebHandlerOnlyQueryParamExample {
                 String name = (nameQuery == null) ? "world" : nameQuery;
 
                 String content = "Hello " + name;
+
                 log.info("responseBody: {}", content);
+
                 Mono<DataBuffer> responseBody = Mono.just(
-                        response.bufferFactory().wrap(content.getBytes())
+                        response.bufferFactory()
+                                .wrap(content.getBytes())
                 );
 
                 response.addCookie(ResponseCookie.from("name", name).build());
                 response.getHeaders().add("Content-Type", "text/plain");
+
                 return response.writeWith(responseBody);
             }
         };
@@ -44,7 +49,8 @@ public class WebHandlerOnlyQueryParamExample {
                 .webHandler(webHandler)
                 .build();
 
-        final var adapter = new ReactorHttpHandlerAdapter(webHttpHandler);
+        var adapter = new ReactorHttpHandlerAdapter(webHttpHandler);
+
         HttpServer.create()
                 .host("localhost")
                 .port(8080)

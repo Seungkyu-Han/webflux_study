@@ -10,13 +10,15 @@ public class OnErrorReturnAfterExecuteExample {
         log.info("start main");
 
         Flux.just(1)
-                        .onErrorReturn(shouldDoOnError())
-                                .subscribe(value -> log.info("value: {}", value));
+                .onErrorReturn(shouldDoOnError())
+                .subscribe(
+                        value -> log.info("value: {}", value)
+                );
 
         log.info("end main");
     }
 
-    private static int shouldDoOnError() {
+    private static int shouldDoOnError(){
         log.info("shouldDoOnError");
         return 0;
     }
