@@ -14,17 +14,17 @@ import reactor.core.publisher.Mono;
 public class WebSocketConfig {
 
     @Bean
-    public WebSocketHandlerAdapter handlerAdapter() {
-        return new WebSocketHandlerAdapter(this.webSocketService());
+    public WebSocketHandlerAdapter webSocketHandlerAdapter(){
+        return new WebSocketHandlerAdapter(webSocketService());
     }
 
     @Bean
-    public WebSocketService webSocketService() {
-        HandshakeWebSocketService webSocketService = new HandshakeWebSocketService(){
+    WebSocketService webSocketService(){
+        HandshakeWebSocketService websocketService = new HandshakeWebSocketService(){
             @Override
             public Mono<Void> handleRequest(ServerWebExchange exchange, WebSocketHandler handler) {
                 String iam = exchange.getRequest().getHeaders().getFirst("X-I-AM");
-                if (iam != null) {
+                if(iam == null){
                     exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
                     return exchange.getResponse().setComplete();
                 }
@@ -37,7 +37,7 @@ public class WebSocketConfig {
             }
         };
 
-        webSocketService.setSessionAttributePredicate(s -> true);
-        return webSocketService;
+        websocketService.setSessionAttributePredicate(s -> true);
+        return websocketService;
     }
 }
